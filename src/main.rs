@@ -44,9 +44,14 @@ fn main() {
 
         uniform vec2 windowSize;
         out vec4 color;
+        
+        uniform Buffer {
+            float array[128];
+        };
 
         void main() {
-            color = vec4(gl_FragCoord.x/windowSize.x, gl_FragCoord.y/windowSize.y, gl_FragCoord.z, 1.0);
+            float val = array[int(gl_FragCoord.x/windowSize.x*127)];
+            color = vec4(val, gl_FragCoord.y/windowSize.y, gl_FragCoord.z, 1.0);
         }
     "#;
 
@@ -57,19 +62,30 @@ fn main() {
         None,
     )
     .unwrap();
+    
+    let mut gpu_buffer = glium::uniforms::UniformBuffer::<[f32; 128]>::empty_persistent(&display).unwrap();
+    let mut buffer: [f32; 128] = [0.0; 128];
 
     let mut closed = false;
     while !closed {
         let mut target = display.draw();
         let (width, height) = target.get_dimensions();
         target.clear_color(0.0, 0.0, 1.0, 1.0);
+        
+        for i in (0..127) {
+            buffer[i] = f32::sin((i as f32)/32.0);
+        }
+        gpu_buffer.write(&buffer);
         target
             .draw(
                 &vertex_buffer,
                 &indices,
                 &program,
                 // &glium::uniforms::EmptyUniforms,
-                &uniform! {windowSize: [width as f32, height as f32]},
+                &uniform! {
+                    windowSize: [width as f32, height as f32],
+                    Buffer: &gpu_buffer,
+                },
                 &Default::default(),
             )
             .unwrap();
