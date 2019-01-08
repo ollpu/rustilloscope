@@ -63,7 +63,7 @@ fn main() {
     )
     .unwrap();
     
-    let mut gpu_buffer = glium::uniforms::UniformBuffer::<[f32; 128]>::empty_persistent(&display).unwrap();
+    let gpu_buffer = glium::uniforms::UniformBuffer::<[f32; 128]>::empty_persistent(&display).unwrap();
     let mut buffer: [f32; 128] = [0.0; 128];
 
     let mut closed = false;
@@ -72,8 +72,8 @@ fn main() {
         let (width, height) = target.get_dimensions();
         target.clear_color(0.0, 0.0, 1.0, 1.0);
         
-        for i in (0..127) {
-            buffer[i] = f32::sin((i as f32)/32.0);
+        for i in 0..127 {
+            buffer[i] = f32::sin((i as f32)/4.0)/2.0+0.5;
         }
         gpu_buffer.write(&buffer);
         target
