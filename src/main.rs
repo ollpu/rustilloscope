@@ -44,14 +44,14 @@ fn main() {
 
         uniform vec2 windowSize;
         out vec4 color;
-        
+
         uniform Buffer {
-            float array[128];
+            float kana[512];
         };
 
         void main() {
-            float val = array[int(gl_FragCoord.x/windowSize.x*127)];
-            color = vec4(val, gl_FragCoord.y/windowSize.y, gl_FragCoord.z, 1.0);
+            float val = kana[int(gl_FragCoord.x) % 128];
+            color = vec4(val, val, val, 1.0);
         }
     "#;
 
@@ -62,18 +62,23 @@ fn main() {
         None,
     )
     .unwrap();
-    
-    let gpu_buffer = glium::uniforms::UniformBuffer::<[f32; 128]>::empty_persistent(&display).unwrap();
-    let mut buffer: [f32; 128] = [0.0; 128];
+
+    const BUF_LEN: usize = 512;
+    let gpu_buffer =
+        glium::uniforms::UniformBuffer::<[f32; BUF_LEN]>::empty_persistent(
+            &display,
+        )
+        .unwrap();
+    let mut buffer: [f32; BUF_LEN] = [0.0; BUF_LEN];
 
     let mut closed = false;
     while !closed {
         let mut target = display.draw();
         let (width, height) = target.get_dimensions();
         target.clear_color(0.0, 0.0, 1.0, 1.0);
-        
-        for i in 0..127 {
-            buffer[i] = f32::sin((i as f32)/4.0)/2.0+0.5;
+
+        for i in 0..BUF_LEN {
+            buffer[i] = f32::sin((i as f32) / 4.0) / 2.0 + 0.5;
         }
         gpu_buffer.write(&buffer);
         target
