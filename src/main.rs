@@ -122,10 +122,11 @@ fn main() {
         });
 
         let end = PreciseTime::now();
-        println!(
-            "Current framerate: {}hz",
-            1f32 / (start.to(end).num_microseconds().unwrap() as f32
-                / 1_000_000f32)
-        );
+        /* println!(
+         * "Current framerate: {}hz",
+         * 1f32 / (start.to(end).num_microseconds().unwrap() as f32
+         * / 1_000_000f32)
+         * );
+         */
     }
 }
