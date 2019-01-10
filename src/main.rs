@@ -104,7 +104,8 @@ fn main() {
                     );
                     mouse = [
                         f32::sqrt(2.0) * position.x as f32 / width as f32,
-                        f32::sqrt(2.0) * position.y as f32 / height as f32,
+                        1f32 - f32::sqrt(2.0) * position.y as f32
+                            / height as f32,
                     ];
                 }
                 _ => (),

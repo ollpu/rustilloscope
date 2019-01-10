@@ -26,6 +26,11 @@ void main() {
     vec2 relpos = gl_FragCoord.xy / windowSize;
     vec2 viewpos = viewPort[0] + relpos * (viewPort[1] - viewPort[0]);
 
+    if (length(mouse - relpos) < 0.05) {
+        color = vec4(1.,0.,0.,1.);
+        return;
+    }
+
     if (viewpos.x * viewpos.y > 0.5) {
         color = vec4(1.,1.,1.,1.);
     } else {
