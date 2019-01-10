@@ -6,3 +6,4 @@ authors = ["Roope Salmi <rpsalmi@gmail.com>", "Niklas Halonen <kahvikannu@gmail.
 [dependencies]
 glium = "0.23.0"
 portaudio = "0.7.0"
+time = "0.1.0"

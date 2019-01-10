@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate glium;
+extern crate time;
+use time::PreciseTime;
 
 fn main() {
     use glium::glutin::WindowEvent::*;
@@ -18,12 +20,19 @@ fn main() {
     implement_vertex!(Vertex, position);
 
     let shape = vec![
-        Vertex { position: [-1., -1.] },
+        Vertex {
+            position: [-1., -1.],
+        },
         Vertex { position: [1., 1.] },
-        Vertex { position: [-1., 1.] },
-        
-        Vertex { position: [-1., -1.] },
-        Vertex { position: [1., -1.] },
+        Vertex {
+            position: [-1., 1.],
+        },
+        Vertex {
+            position: [-1., -1.],
+        },
+        Vertex {
+            position: [1., -1.],
+        },
         Vertex { position: [1., 1.] },
     ];
     let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
@@ -69,10 +78,12 @@ fn main() {
             &display,
         )
         .unwrap();
-    let mut buffer = [[0.0f32; 4]; BUF_LEN/4];
+    let mut buffer = [[0.0f32; 4]; BUF_LEN / 4];
 
     let mut closed = false;
     while !closed {
+        let start = PreciseTime::now();
+
         let mut target = display.draw();
         let (width, height) = target.get_dimensions();
         target.clear_color(0.0, 0.0, 1.0, 1.0);
@@ -104,5 +115,12 @@ fn main() {
             },
             _ => (),
         });
+
+        let end = PreciseTime::now();
+        println!(
+            "Current framerate: {}hz",
+            1f32 / (start.to(end).num_microseconds().unwrap() as f32
+                / 1_000_000f32)
+        );
     }
 }
