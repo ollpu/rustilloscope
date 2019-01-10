@@ -54,13 +54,18 @@ fn main() {
         out vec4 color;
 
         layout(packed) uniform Buffer {
-            vec4 kana[256];
+            vec4 array[256];
         };
 
         void main() {
-            int idx = int(gl_FragCoord.x) % 1024;
-            float val = kana[idx >> 2][idx & 3];
-            color = vec4(val, val, val, 1.0);
+            int idx = int(gl_FragCoord.x/windowSize.x*1024.);
+            float val = array[idx >> 2][idx & 3];
+            float y = gl_FragCoord.y/windowSize.y*2.-1.;
+            if (abs(val-y) < 0.01) {
+                color = vec4(0.2, 1., 0.2, 1.);
+            } else {
+                color = vec4(0., 0.2, 0., 1.);
+            }
         }
     "#;
 
@@ -89,7 +94,7 @@ fn main() {
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
         for i in 0..BUF_LEN {
-            buffer[i >> 2][i & 3] = f32::sin((i as f32) / 4.0) / 2.0 + 0.5;
+            buffer[i >> 2][i & 3] = f32::sin((i as f32) / 32.0) / 2.0 + 0.5;
         }
         gpu_buffer.write(&buffer);
         target
