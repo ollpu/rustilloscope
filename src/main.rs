@@ -13,6 +13,7 @@ fn main() {
     let context = glium::glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &events_loop).unwrap();
     let hidpi_factor = display.gl_window().window().get_hidpi_factor();
+    println!("{}", hidpi_factor);
 
     #[derive(Copy, Clone)]
     struct Vertex {
@@ -75,7 +76,7 @@ fn main() {
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
         for i in 0..BUF_LEN {
-            buffer[i >> 2][i & 3] = f32::sin((i as f32) / 32.0) / 2.0 + 0.5;
+            buffer[i >> 2][i & 3] = f32::sin((i as f32) / 32.0) / 2.0;
         }
         gpu_buffer.write(&buffer);
         target
