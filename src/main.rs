@@ -8,9 +8,11 @@ fn main() {
     use glium::{glutin, Surface};
 
     let mut events_loop = glium::glutin::EventsLoop::new();
+
     let window = glium::glutin::WindowBuilder::new();
     let context = glium::glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &events_loop).unwrap();
+    let hidpi_factor = display.gl_window().window().get_hidpi_factor();
 
     #[derive(Copy, Clone)]
     struct Vertex {
@@ -97,14 +99,14 @@ fn main() {
                 CursorMoved { position, .. } => {
                     println!(
                         "x:{}, y:{} w:{} h:{}",
-                        position.x * f64::sqrt(2.0),
-                        position.y * f64::sqrt(2.0),
+                        position.x * hidpi_factor,
+                        position.y * hidpi_factor,
                         width,
                         height
                     );
                     mouse = [
-                        f32::sqrt(2.0) * position.x as f32 / width as f32,
-                        1f32 - f32::sqrt(2.0) * position.y as f32
+                        hidpi_factor as f32 * position.x as f32 / width as f32,
+                        1f32 - hidpi_factor as f32 * position.y as f32
                             / height as f32,
                     ];
                 }
