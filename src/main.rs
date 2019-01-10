@@ -49,19 +49,43 @@ fn main() {
     "#;
     let fragment_shader_src = r#"
         #version 140
+        #define SIZE 1024
 
         uniform vec2 windowSize;
+        uniform vec2 mouse;
         out vec4 color;
 
+        float distLine(vec2 line, vec2 point) {
+            float s = dot(line, point) / dot(line, line);
+            vec2 x = point-line*s;
+            return length(x);
+        }
+
         layout(packed) uniform Buffer {
-            vec4 array[256];
+            vec4 array[SIZE/4];
         };
 
         void main() {
-            int idx = int(gl_FragCoord.x/windowSize.x*1024.);
-            float val = array[idx >> 2][idx & 3];
-            float y = gl_FragCoord.y/windowSize.y*2.-1.;
-            if (abs(val-y) < 0.01) {
+            int idx = int(gl_FragCoord.x/windowSize.x*float(SIZE));
+            float val = array[idx >> 2][idx & 3]/2.0+0.25;
+            float nval = (idx+1==SIZE)
+                ? -100.0
+                : array[idx+1 >> 2][idx+1 & 3]/2.0+0.25;
+
+            vec2 diffline = vec2(1, windowSize.y*(nval - val));
+            vec2 point = vec2(0, gl_FragCoord.y - val*windowSize.y);
+
+            float dist = distLine(diffline, point);
+
+            vec2 mousepos = vec2(
+                sqrt(2)*windowSize.x * mouse.x,
+                windowSize.y * (1-sqrt(2)*mouse.y)
+            );
+            if (length(mousepos - gl_FragCoord.xy) < 10.0) {
+                color = vec4(1., 1., 1., 1.);
+                return;
+            }
+            if (dist < 3) {
                 color = vec4(0.2, 1., 0.2, 1.);
             } else {
                 color = vec4(0., 0.2, 0., 1.);
@@ -84,6 +108,7 @@ fn main() {
         )
         .unwrap();
     let mut buffer = [[0.0f32; 4]; BUF_LEN / 4];
+    let mut mouse = [0.0f32; 2];
 
     let mut closed = false;
     while !closed {
@@ -102,10 +127,10 @@ fn main() {
                 &vertex_buffer,
                 &indices,
                 &program,
-                // &glium::uniforms::EmptyUniforms,
                 &uniform! {
                     windowSize: [width as f32, height as f32],
                     Buffer: &gpu_buffer,
+                    mouse: mouse,
                 },
                 &Default::default(),
             )
@@ -115,7 +140,13 @@ fn main() {
         events_loop.poll_events(|ev| match ev {
             glutin::Event::WindowEvent { event, .. } => match event {
                 CloseRequested => closed = true,
-                CursorMoved { position, .. } => println!("{:?}", position),
+                CursorMoved { position, .. } => {
+                    println!("{:?}, {} {}", position, width, height);
+                    mouse = [
+                        position.x as f32 / width as f32,
+                        position.y as f32 / height as f32,
+                    ];
+                }
                 _ => (),
             },
             _ => (),
