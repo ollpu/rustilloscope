@@ -17,16 +17,15 @@ fn main() {
 
     implement_vertex!(Vertex, position);
 
-    let vertex1 = Vertex {
-        position: [-0.5, -0.5],
-    };
-    let vertex2 = Vertex {
-        position: [0.0, 0.5],
-    };
-    let vertex3 = Vertex {
-        position: [0.5, -0.25],
-    };
-    let shape = vec![vertex1, vertex2, vertex3];
+    let shape = vec![
+        Vertex { position: [-1., -1.] },
+        Vertex { position: [1., 1.] },
+        Vertex { position: [-1., 1.] },
+        
+        Vertex { position: [-1., -1.] },
+        Vertex { position: [1., -1.] },
+        Vertex { position: [1., 1.] },
+    ];
     let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
     let indices =
         glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
@@ -45,12 +44,13 @@ fn main() {
         uniform vec2 windowSize;
         out vec4 color;
 
-        uniform Buffer {
-            float kana[512];
+        layout(packed) uniform Buffer {
+            vec4 kana[256];
         };
 
         void main() {
-            float val = kana[int(gl_FragCoord.x) % 128];
+            int idx = int(gl_FragCoord.x) % 1024;
+            float val = kana[idx >> 2][idx & 3];
             color = vec4(val, val, val, 1.0);
         }
     "#;
@@ -63,13 +63,13 @@ fn main() {
     )
     .unwrap();
 
-    const BUF_LEN: usize = 512;
+    const BUF_LEN: usize = 1024;
     let gpu_buffer =
-        glium::uniforms::UniformBuffer::<[f32; BUF_LEN]>::empty_persistent(
+        glium::uniforms::UniformBuffer::<[[f32; 4]; BUF_LEN/4]>::empty_persistent(
             &display,
         )
         .unwrap();
-    let mut buffer: [f32; BUF_LEN] = [0.0; BUF_LEN];
+    let mut buffer = [[0.0f32; 4]; BUF_LEN/4];
 
     let mut closed = false;
     while !closed {
@@ -78,7 +78,7 @@ fn main() {
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
         for i in 0..BUF_LEN {
-            buffer[i] = f32::sin((i as f32) / 4.0) / 2.0 + 0.5;
+            buffer[i >> 2][i & 3] = f32::sin((i as f32) / 4.0) / 2.0 + 0.5;
         }
         gpu_buffer.write(&buffer);
         target
