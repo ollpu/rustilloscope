@@ -1,9 +1,16 @@
 #[macro_use]
 extern crate glium;
-// extern crate time;
-// use time::PreciseTime;
+
+// mod audio;
+
+extern crate time;
+use time::PreciseTime;
 
 fn main() {
+    // audio::run().unwrap_or_else(|e: audio::pa::Error| {
+    //     eprintln!("Audio has failed: {}", e)
+    // });
+
     use glium::glutin::WindowEvent::*;
     use glium::{glutin, Surface};
 
@@ -68,7 +75,7 @@ fn main() {
 
     let mut closed = false;
     while !closed {
-        // let start = PreciseTime::now();
+        let start = PreciseTime::now();
 
         let mut target = display.draw();
         let (width, height) = target.get_dimensions();
@@ -115,12 +122,11 @@ fn main() {
             _ => (),
         });
 
-        // let end = PreciseTime::now();
-        /* println!(
-         * "Current framerate: {}hz",
-         * 1f32 / (start.to(end).num_microseconds().unwrap() as f32
-         * / 1_000_000f32)
-         * );
-         */
+        let end = PreciseTime::now();
+        println!(
+        "Current framerate: {}hz",
+        1f32 / (start.to(end).num_microseconds().unwrap() as f32
+        / 1_000_000f32)
+        );
     }
 }

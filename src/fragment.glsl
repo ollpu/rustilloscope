@@ -22,7 +22,25 @@ vec2 l2g(vec2 point, vec2 vp1, vec2 vp2) {
     return point * (vp2 - vp1) + vp1;
 }
 
+vec2 mandelbrot_iter(vec2 z, vec2 c) {
+    vec2 znext = vec2(z.x * z.x - z.y * z.y, 2 * z.x * z.y);
+    return znext + c;
+}
+
 void main() {
+    vec2 vp1 = vec2(-2.0, -1.0);
+    vec2 vp2 = vec2(1.0, 1.0);
+    vec2 c = l2g(gl_FragCoord.xy / windowSize - mouse + vec2(0.5), vp1, vp2);
+    vec2 z0 = vec2(0.0);
+    int i = 0;
+    const int max_iter = 600;
+    for (; i < max_iter; ++i) {
+        z0 = mandelbrot_iter(z0, c);
+        if (length(z0) > 2) break;
+    }
+
+    color = vec4(float(i) / float(max_iter));
+
     // vec2 viewstart = vec2(-1.0, -1.0) * windowSize;
     // vec2 viewend = vec2(2.0, 2.0) * windowSize;
     // vec2 globalpos = l2g(gl_FragCoord.xy, viewstart, viewend);
