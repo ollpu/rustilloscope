@@ -14,9 +14,9 @@ pub fn run() -> Result<(), pa::Error> {
     println!("version text: {:?}", pa.version_text());
     println!("host count: {}", try!(pa.host_api_count()));
 
-    
-    let mut settings = pa.default_input_stream_settings(CHANNELS, SAMPLE_RATE, FRAMES)?;
-    
+    let mut settings =
+        pa.default_input_stream_settings(CHANNELS, SAMPLE_RATE, FRAMES)?;
+
     let callback = move |args: pa::InputStreamCallbackArgs<f32>| {
         let pa::InputStreamCallbackArgs { buffer, .. } = args;
         println!("{}", buffer[0]);

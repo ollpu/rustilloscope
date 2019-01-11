@@ -101,9 +101,9 @@ fn main() {
                 CloseRequested => closed = true,
                 CursorMoved { position, .. } => {
                     println!(
-                        "x:{}, y:{} w:{} h:{}",
-                        position.x * hidpi_factor,
-                        position.y * hidpi_factor,
+                        "x:{:6}, y:{:6} w:{:6} h:{:6}",
+                        (position.x * hidpi_factor) as i32,
+                        (position.y * hidpi_factor) as i32,
                         width,
                         height
                     );
