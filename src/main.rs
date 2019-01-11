@@ -78,8 +78,13 @@ fn main() {
         let (width, height) = target.get_dimensions();
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
-        for i in 0..BUF_LEN {
-            buffer[i >> 2][i & 3] = f32::sin((i as f32) / 32.0) / 2.0;
+        {
+            let mut deque = audiosession.buffer.lock().unwrap();
+            if let Some(xdata) = deque.back() {
+                for i in 0..BUF_LEN {
+                    buffer[i >> 2][i & 3] = xdata[i];
+                }
+            }
         }
         gpu_buffer.write(&buffer);
         target

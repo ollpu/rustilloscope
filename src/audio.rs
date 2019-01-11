@@ -5,7 +5,7 @@ use std::sync::{Mutex, Arc};
 use std::collections::VecDeque;
 
 const SAMPLE_RATE: f64 = 44_100.0;
-const FRAMES: usize = 256;
+const FRAMES: usize = 1024;
 const CHANNELS: i32 = 1;
 const INTERLEAVED: bool = true;
 
