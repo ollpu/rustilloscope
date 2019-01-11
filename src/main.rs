@@ -72,6 +72,7 @@ fn main() {
         .unwrap();
     let mut buffer = [[0.0f32; 4]; BUF_LEN / 4];
     let mut mouse = [0.0f32; 2];
+    let mut scroll = 0f32;
 
     let mut closed = false;
     while !closed {
@@ -94,6 +95,7 @@ fn main() {
                     windowSize: [width as f32, height as f32],
                     Buffer: &gpu_buffer,
                     mouse: mouse,
+                    scroll: scroll,
                 },
                 &Default::default(),
             )
@@ -117,16 +119,20 @@ fn main() {
                             / height as f32,
                     ];
                 }
-                _ => (),
+                MouseWheel { delta, .. } => match delta {
+                    glutin::MouseScrollDelta::LineDelta(_, y) => scroll += y,
+                    _ => (),
+                },
+                x => println!("{:?}", x),
             },
             _ => (),
         });
 
         let end = PreciseTime::now();
         println!(
-        "Current framerate: {}hz",
-        1f32 / (start.to(end).num_microseconds().unwrap() as f32
-        / 1_000_000f32)
+            "Current framerate: {}hz",
+            1f32 / (start.to(end).num_microseconds().unwrap() as f32
+                / 1_000_000f32)
         );
     }
 }

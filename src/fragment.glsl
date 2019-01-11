@@ -4,6 +4,7 @@ const int BUF_SIZE = 1024;
 
 uniform vec2 windowSize;
 uniform vec2 mouse;
+uniform float scroll;
 out vec4 color;
 
 layout(std140) uniform Buffer {
@@ -22,6 +23,10 @@ vec2 l2g(vec2 point, vec2 vp1, vec2 vp2) {
     return point * (vp2 - vp1) + vp1;
 }
 
+vec2 l2g2(vec2 point, vec4 vp) {
+    return point * (vp.zw - vp.xy) + vp.xy;
+}
+
 vec2 mandelbrot_iter(vec2 z, vec2 c) {
     vec2 znext = vec2(z.x * z.x - z.y * z.y, 2 * z.x * z.y);
     return znext + c;
@@ -30,7 +35,12 @@ vec2 mandelbrot_iter(vec2 z, vec2 c) {
 void main() {
     vec2 vp1 = vec2(-2.0, -1.0);
     vec2 vp2 = vec2(1.0, 1.0);
-    vec2 c = l2g(gl_FragCoord.xy / windowSize - mouse + vec2(0.5), vp1, vp2);
+    vec4 vp = vec4(vp1, vp2);
+    float zoom = pow(2.0, scroll);
+    vec2 c = l2g2(
+        gl_FragCoord.xy / windowSize,
+        vec4(zoom * vp1 - 2.0*mouse + vec2(1.0), zoom * vp2 - 2.0*mouse + vec2(1.0))
+    );
     vec2 z0 = vec2(0.0);
     int i = 0;
     const int max_iter = 600;
