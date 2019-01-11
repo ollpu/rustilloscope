@@ -1,9 +1,11 @@
 #[macro_use]
 extern crate glium;
+mod audio;
 // extern crate time;
 // use time::PreciseTime;
 
 fn main() {
+    audio::run().unwrap_or_else(|x| eprintln!("{:?}", x));
     use glium::glutin::WindowEvent::*;
     use glium::{glutin, Surface};
 
