@@ -5,7 +5,8 @@ mod audio;
 // use time::PreciseTime;
 
 fn main() {
-    audio::run().unwrap_or_else(|x| eprintln!("{:?}", x));
+    let audiosession = audio::run().unwrap();
+    
     use glium::glutin::WindowEvent::*;
     use glium::{glutin, Surface};
 
