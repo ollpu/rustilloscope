@@ -6,7 +6,7 @@ mod audio;
 
 fn main() {
     let audiosession = audio::run().unwrap();
-    
+
     use glium::glutin::WindowEvent::*;
     use glium::{glutin, Surface};
 
@@ -79,7 +79,7 @@ fn main() {
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
         {
-            let mut deque = audiosession.buffer.lock().unwrap();
+            let deque = audiosession.buffer.lock().unwrap();
             if let Some(xdata) = deque.back() {
                 for i in 0..BUF_LEN {
                     buffer[i >> 2][i & 3] = xdata[i];
