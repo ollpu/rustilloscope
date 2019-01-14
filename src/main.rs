@@ -1,20 +1,30 @@
 #[macro_use]
 extern crate glium;
+extern crate glium_text;
+
 mod audio;
 // extern crate time;
 // use time::PreciseTime;
+use glium::glutin::WindowEvent::*;
+use glium::{glutin, Surface};
 
 fn main() {
     let audiosession = audio::run().unwrap();
-
-    use glium::glutin::WindowEvent::*;
-    use glium::{glutin, Surface};
 
     let mut events_loop = glium::glutin::EventsLoop::new();
 
     let window = glium::glutin::WindowBuilder::new();
     let context = glium::glutin::ContextBuilder::new();
     let display = glium::Display::new(window, context, &events_loop).unwrap();
+    let system = glium_text::TextSystem::new(&display);
+    let font = glium_text::FontTexture::new(
+        &display,
+        std::fs::File::open(&std::path::Path::new("DejaVuSansMono.ttf"))
+            .unwrap(),
+        72,
+    )
+    .unwrap();
+
     let hidpi_factor = display.gl_window().window().get_hidpi_factor();
     println!("{}", hidpi_factor);
 
@@ -60,6 +70,14 @@ fn main() {
         None,
     )
     .unwrap();
+    // let text = glium_text::TextDisplay::new(&system, &font, "Hello world!");
+    let matrix = [
+        [0.1, 0.0, 0.0, 0.0],
+        [0.0, 0.1, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0],
+        [-0.5, -0.5, 0.0, 1.0],
+    ];
+    let text = glium_text::TextDisplay::new(&system, &font, "Hello world!");
 
     const BUF_LEN: usize = 1024;
     let gpu_buffer =
@@ -67,6 +85,7 @@ fn main() {
             &display,
         )
         .unwrap();
+
     let mut buffer = [[0.0f32; 4]; BUF_LEN / 4];
     let mut mouse = [0.0f32; 2];
 
@@ -100,6 +119,15 @@ fn main() {
                 &Default::default(),
             )
             .unwrap();
+
+        glium_text::draw(
+            &text,
+            &system,
+            &mut target,
+            matrix,
+            (1.0, 1.0, 0.0, 1.0),
+        );
+
         target.finish().unwrap();
 
         events_loop.poll_events(|ev| match ev {

@@ -1,9 +1,10 @@
 [package]
 name = "rustillosope"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Roope Salmi <rpsalmi@gmail.com>", "Niklas Halonen <kahvikannu@gmail.com>"]
 
 [dependencies]
 glium = "0.23.0"
 portaudio = "0.7.0"
 time = "0.1.0"
+glium_text = { git = "https://github.com/ollpu/glium_text" }
